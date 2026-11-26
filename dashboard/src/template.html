@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Analytics Dashboard | Deepa M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>/*__CHARTJS__*/</script>
+<script>/*__XLSX__*/</script>
+<script>window.HR_DATA = Object(/*__DATA__*/);</script>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark">DM</div>
+      <div class="brand-text"><h1>HR Analytics Dashboard</h1><p>Prepared by Deepa M</p></div>
+    </div>
+    <div class="top-actions">
+      <div class="filters">
+        <select id="f-dept" aria-label="Department"><option value="">All departments</option></select>
+        <select id="f-gender" aria-label="Gender"><option value="">All genders</option></select>
+        <select id="f-city" aria-label="City"><option value="">All cities</option></select>
+        <select id="f-status" aria-label="Status"><option value="">Active + left</option><option value="active">Active only</option><option value="left">Left only</option></select>
+        <select id="f-ot" aria-label="Overtime"><option value="">Overtime: any</option><option value="Yes">Overtime: yes</option><option value="No">Overtime: no</option></select>
+      </div>
+      <button class="btn" id="reset">Reset filters</button>
+      <button class="btn" id="load">Load Excel file</button>
+      <input type="file" id="file" accept=".xlsx,.xls" hidden>
+      <span id="status-pill" class="ok"><span class="dot"></span><span id="status-text">Loading</span></span>
+    </div>
+  </div>
+  <nav class="subnav"><div class="wrap">
+    <a href="#summary">Summary</a><a href="#composition">Workforce</a><a href="#pay">Pay</a><a href="#attrition">Attrition</a><a href="#performance">Performance</a><a href="#employees">Employees</a>
+  </div></nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h2>Workforce, pay and attrition at a glance.</h2>
+      <p class="lead">Built from <strong>hr_analytics_dataset_cleaned.xlsx</strong>. Use the filters or click any bar or slice to cross-filter every chart. Load another Excel file with the same columns to refresh the whole dashboard.</p>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="hero-figure">
+      <span class="label">Active employees in view</span><span class="big" id="hero-n">0</span>
+      <span class="sub" id="hero-asof"></span>
+    </div>
+  </div>
+</section>
+
+<section class="tight" id="summary"><div class="wrap">
+  <div class="section-head"><h2>Summary</h2><span class="hint">Highlights update with the filters</span></div>
+  <div class="insight-grid" id="insights"></div>
+  <div class="kpi-grid" id="kpis" style="margin-top:16px"></div>
+</div></section>
+<hr class="divider">
+
+<section id="composition"><div class="wrap">
+  <div class="section-head"><h2>Workforce</h2><span class="hint">Active employees. Click a bar to filter.</span></div>
+  <div class="grid-3">
+    <div class="card"><h3>Headcount by department</h3><div class="chart-box"><canvas id="c-dept"></canvas></div></div>
+    <div class="card"><h3>Gender</h3><div class="chart-box"><canvas id="c-gender"></canvas></div></div>
+    <div class="card"><h3>Age bands</h3><div class="chart-box"><canvas id="c-age"></canvas></div></div>
+  </div>
+  <div class="grid-3" style="margin-top:18px">
+    <div class="card"><h3>Education</h3><div class="chart-box"><canvas id="c-edu"></canvas></div></div>
+    <div class="card"><h3>Headcount by city</h3><div class="chart-box"><canvas id="c-city"></canvas></div></div>
+    <div class="card"><h3>Experience bands</h3><div class="chart-box"><canvas id="c-exp"></canvas></div></div>
+  </div>
+  <div class="grid-2b" style="margin-top:18px">
+    <div class="card"><h3>Hires by year</h3><div class="chart-box short"><canvas id="c-hires"></canvas></div></div>
+    <div class="card"><h3>Exits by quarter</h3><div class="chart-box short"><canvas id="c-exits"></canvas></div></div>
+  </div>
+</div></section>
+
+<section class="tight" id="pay"><div class="wrap">
+  <div class="section-head"><h2>Pay</h2><span class="hint">Monthly salary in rupees, active employees</span></div>
+  <div class="grid-3">
+    <div class="card"><h3>Average salary by department</h3><div class="chart-box"><canvas id="c-sal"></canvas></div></div>
+    <div class="card"><h3>Average salary by gender</h3><div class="chart-box"><canvas id="c-salg"></canvas></div></div>
+    <div class="card"><h3>Salary bands</h3><div class="chart-box"><canvas id="c-salband"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Salary vs experience</h3><p class="card-sub">Each dot is one employee. Hover for details.</p><div class="chart-box tall"><canvas id="c-scatter"></canvas></div></div>
+</div></section>
+
+<section id="attrition"><div class="wrap">
+  <div class="section-head"><h2>Attrition</h2><span class="hint">Share of employees who have left</span></div>
+  <div class="grid-2b">
+    <div class="card"><h3>Attrition rate by department</h3><div class="chart-box"><canvas id="c-attr"></canvas></div></div>
+    <div class="card"><div class="tools" style="justify-content:space-between"><h3>Attrition rate by</h3><select id="driver"></select></div><div class="chart-box" style="margin-top:10px"><canvas id="c-driver"></canvas></div></div>
+  </div>
+</div></section>
+
+<section class="tight" id="performance"><div class="wrap">
+  <div class="section-head"><h2>Performance and engagement</h2><span class="hint">Active employees</span></div>
+  <div class="grid-3">
+    <div class="card"><h3>Satisfaction, work-life balance and rating</h3><p class="card-sub">Average score out of 5</p><div class="chart-box"><canvas id="c-eng"></canvas></div></div>
+    <div class="card"><h3>Performance rating mix</h3><div class="chart-box"><canvas id="c-perf"></canvas></div></div>
+    <div class="card"><h3>Training hours by rating</h3><p class="card-sub">Average hours last year</p><div class="chart-box"><canvas id="c-train"></canvas></div></div>
+  </div>
+</div></section>
+
+<section id="employees"><div class="wrap">
+  <div class="section-head"><h2>Employees</h2><span class="hint">Risk score is rule-based: overtime, low satisfaction, poor balance, long commute, no promotion, low pay, low training</span></div>
+  <div class="card tbl">
+    <div class="tools" style="margin-bottom:12px"><input type="search" id="q" placeholder="Search name, ID or job title"><button class="btn" id="csv">Download filtered CSV</button></div>
+    <div class="tbl-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+    <div class="pager"><span id="count"></span><span><button class="btn" id="prev">Previous</button> <button class="btn" id="next">Next</button></span></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="creator-box">
+    <div class="avatar">DM</div>
+    <div class="creator-meta"><h3>Deepa M</h3><p>Designed and built by Deepa M: Excel data model and interactive dashboard.</p><p class="role">Creator, HR Analytics Dashboard</p></div>
+    <div class="foot-links"><a href="https://www.linkedin.com/in/deepa-m-681b57203" target="_blank" rel="noopener">LinkedIn</a></div>
+  </div>
+  <p class="fineprint">Data source: hr_analytics_dataset_cleaned.xlsx. Salaries are monthly figures in rupees. Risk scores are for exploration only. Dashboard © Deepa M.</p>
+</div></footer>
+<div id="toast"></div>
+<script>/*__APP__*/</script>
+</body>
+</html>
